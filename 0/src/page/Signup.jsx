@@ -1,11 +1,34 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    console.log("auth:", auth);
+    console.log("email:", email);
+    console.log("password:", password);
 
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+        navigate("/login");
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        // ..
+      });
+  };
   return (
     <main>
       <section>
@@ -37,7 +60,9 @@ const Signup = () => {
                 />
               </div>
 
-              <button type="submit">Sign up</button>
+              <button type="submit" onClick={onSubmit}>
+                Sign up
+              </button>
             </form>
 
             <p>
